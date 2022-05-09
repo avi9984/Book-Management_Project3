@@ -18,7 +18,7 @@ const createUser = async (req, res) => {
     if (validString(data.name)) return res.status(400).send({ status: false, message: "Name should be valid and should not contains any numbers" });
     if (validMobileNum(data.phone)) return res.status(400).send({ status: false, message: "Enter a valid phone number" });
     if (validEmail(data.email)) return res.status(400).send({ status: false, message: "Enter a valid email-id" });
-    if (validPwd(data.password)) return res.status(400).send({ status: false, message: "Password must contain one of 0-1,A-Z,a-z and special characters" });
+    if (validPwd(data.password)) return res.status(400).send({ status: false, message: "Password should be 8-15 characters long and must contain one of 0-9,A-Z,a-z and special characters" });
 
     let checkUniqueValues = await User.findOne({ $or: [{ phone: data.phone }, { email: data.email }] });
     if (checkUniqueValues) return res.status(400).send({ status: false, message: "E-Mail or phone number already exist" });

@@ -41,7 +41,7 @@ const validEmail = (Email) => {
 };
 
 const validPwd = (Password) => {
-  if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/.test(Password)){
+  if (/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,15}$/.test(Password)){
     return false
   }else {
     return true;
