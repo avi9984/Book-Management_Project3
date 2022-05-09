@@ -14,7 +14,7 @@ const createUser = async (req, res) => {
     if (!data.email) return res.status(400).send({ status: false, message: "Email ID is required" });
     if (!data.password) return res.status(400).send({ status: false, message: "Password is required" });
 
-    if (validTitle(data.title)) return res.status(400).send({ status: false, message: "Title should be one of Mr, Mrs or Miss"});
+    if (validTitle(data.title)) return res.status(400).send({ status: false, message: "Title should be one of Mr, Mrs or Miss" });
     if (validString(data.name)) return res.status(400).send({ status: false, message: "Name should be valid and should not contains any numbers" });
     if (validMobileNum(data.phone)) return res.status(400).send({ status: false, message: "Enter a valid phone number" });
     if (validEmail(data.email)) return res.status(400).send({ status: false, message: "Enter a valid email-id" });
@@ -56,22 +56,22 @@ const userLogin = async function (req, res) {
       email: data.email,
     });
 
-    if(!checkValidUser) {
+    if (!checkValidUser) {
       return res
         .status(401)
         .send({ status: false, msg: "Email is not correct" });
     }
 
     let checkPassword = await bcrypt.compare(data.password, checkValidUser.password);
-    if(!checkPassword) return res.status(401).send({ status: false, msg: "Password is not correct" });
+    if (!checkPassword) return res.status(401).send({ status: false, msg: "Password is not correct" });
 
-    let token = jwt.sign({userId: checkValidUser._id.toString()}, "Books-Management", {expiresIn: "1d"});
-    
+    let token = jwt.sign({ userId: checkValidUser._id.toString() }, "Books-Management", { expiresIn: "1d" });
+
     res.setHeader('x-api-key', token);
     res.status(200).send({ status: true, msg: "Successfully Login", data: token });
-    
+
   } catch (err) {
-    res.status(500).send({ status: false,  message: err.message });
+    res.status(500).send({ status: false, message: err.message });
   }
 };
 
