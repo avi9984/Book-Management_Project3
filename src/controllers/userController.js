@@ -5,7 +5,7 @@ const { checkData, validTitle, validString, validMobileNum, validEmail, validPwd
 
 const createUser = async (req, res) => {
   try {
-    let data = req.body;
+    let data = req.body;  
     if (checkData(data)) return res.status(400).send({ status: false, message: "Enter user details" });
 
     if (!data.title) return res.status(400).send({ status: false, message: "Title is required" });
