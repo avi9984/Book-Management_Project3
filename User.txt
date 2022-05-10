@@ -1,19 +1,7 @@
 Create User: 
 
-1. {
-    "title": "Mr",
-    "name": "John Doe",
-    "phone": 9897969594,
-    "email": "johndoe@mailinator.com", 
-    "password": "Abcd@1234567",
-    "address": {
-        "street": "110, Ridhi Sidhi Tower",
-        "city": "Jaipur",
-        "pincode": "400001"
-    }
-}
 
-2. {
+1. {
     "title": "Mr",
     "name": "Chetan Bhagat",
     "phone": 6234567890,
@@ -26,7 +14,7 @@ Create User:
     }
 }
 
-3. {
+2. {
     "title": "Mr",
     "name": "J.K Rowling",
     "phone": "9676543456",
@@ -39,5 +27,8 @@ Create User:
   }
 }
 
-Login user:-
 
+3.
+
+"email": "rntagore@mailinator.com",
+"password": "Rntagore@123456"
