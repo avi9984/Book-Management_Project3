@@ -5,51 +5,76 @@ const validator = require("../utils/validation");
 
 
 
+
+//    Post/Register  //
+
+
 const createUser = async (req, res) => {
 
   try {
 
     let data = req.body;
 
+    //Validate the Body
+
     if (validator.isValidBody(data)) {
       return res.status(400).send({ status: false, message: "Enter user details" });
     }
+
+    //check the title  
 
     if (!data.title) {
       return res.status(400).send({ status: false, message: "Title is required" });
     }
 
+    //check the name
     if (!data.name) {
       return res.status(400).send({ status: false, message: "Name is required" });
     }
+
+    //check the Phone
 
     if (!data.phone) {
       return res.status(400).send({ status: false, message: "Mobile number is required" });
     }
 
+    //check the email
+
     if (!data.email) {
       return res.status(400).send({ status: false, message: "Email ID is required" });
     }
+
+    //check the password
 
     if (!data.password) {
       return res.status(400).send({ status: false, message: "Password is required" });
     }
 
+    //Validate the title
+
     if (validator.validTitle(data.title)) {
       return res.status(400).send({ status: false, message: "Title should be one of Mr, Mrs or Miss" });
     }
+
+    //Validate  the name
 
     if (validator.validString(data.name)) {
       return res.status(400).send({ status: false, message: "Name should be valid and should not contains any numbers" });
     }
 
+    //Validate the mobile number
+
     if (validator.validMobileNum(data.phone)) {
       return res.status(400).send({ status: false, message: "Enter a valid phone number" });
     }
 
+    //Validate the email
+
     if (validator.validEmail(data.email)) {
       return res.status(400).send({ status: false, message: "Enter a valid email-id" });
     }
+
+    //Validate the password
 
     if (validator.validPwd(data.password)) {
       return res.status(400).send({ status: false, message: "Password should be 8-15 characters long and must contain one of 0-9,A-Z,a-z and special characters" });
@@ -77,7 +102,13 @@ const createUser = async (req, res) => {
 
     }
 
+
+    //Password Encryption 
+
     data.password = await bcrypt.hash(data.password, 10);
+
+
+    // Finally the registration of User is successful
 
     let userData = await userModel.create(data);
 
@@ -91,7 +122,7 @@ const createUser = async (req, res) => {
 
 
 
-// ************************************************************ Post /login ************************************************************* //
+//    Post/login  //
 
 
 
@@ -100,9 +131,13 @@ const userLogin = async function (req, res) {
 
     let data = req.body;
 
+    //Validate the body
+
     if (validator.isValidBody(data)) {
       return res.status(400).send({ status: false, message: "Enter user details" });
     }
+
+    //Check the email
 
     if (!data.email) {
       return res
@@ -110,19 +145,27 @@ const userLogin = async function (req, res) {
         .send({ status: false, message: "Email ID is required" });
     }
 
+    //check the password
+
     if (!data.password) {
       return res
         .status(400)
         .send({ status: false, message: "Password is required" });
     }
 
+    //Validate the email
+
     if (validator.validEmail(data.email)) {
       return res.status(400).send({ status: false, message: "Enter a valid email-id" });
     }
 
+    //Validate the password
+
     if (validator.validPwd(data.password)) {
       return res.status(400).send({ status: false, message: "Enter a valid password" });
     }
+
+    //Email check
 
     const checkValidUser = await userModel.findOne({ email: data.email });
 
@@ -132,6 +175,7 @@ const userLogin = async function (req, res) {
         .send({ status: false, msg: "Email Id is not correct " });
     }
 
+    //Password check
 
     let checkPassword = await bcrypt.compare(data.password, checkValidUser.password);
 
@@ -141,6 +185,7 @@ const userLogin = async function (req, res) {
         .send({ status: false, msg: "Password is not correct" });
     }
 
+    // token generation for the logged in user 
 
     let token = jwt.sign(
       {
@@ -151,7 +196,10 @@ const userLogin = async function (req, res) {
       "Books-Management"
     );
 
+    //set token to the header
+
     res.setHeader('x-api-key', token);
+
     res.status(200).send({ status: true, msg: "Successfully Login", data: token });
 
   } catch (err) {
