@@ -1,7 +1,7 @@
-const User = require("../models/userModel");
+const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-const { checkData, validTitle, validString, validMobileNum, validEmail, validPwd } = require("../utils/validation");
+const validator = require("../utils/validation");
 
 
 
@@ -11,7 +11,7 @@ const createUser = async (req, res) => {
 
     let data = req.body;
 
-    if (checkData(data)) {
+    if (validator.isValidBody(data)) {
       return res.status(400).send({ status: false, message: "Enter user details" });
     }
 
@@ -35,35 +35,51 @@ const createUser = async (req, res) => {
       return res.status(400).send({ status: false, message: "Password is required" });
     }
 
-    if (validTitle(data.title)) {
+    if (validator.validTitle(data.title)) {
       return res.status(400).send({ status: false, message: "Title should be one of Mr, Mrs or Miss" });
     }
 
-    if (validString(data.name)) {
+    if (validator.validString(data.name)) {
       return res.status(400).send({ status: false, message: "Name should be valid and should not contains any numbers" });
     }
 
-    if (validMobileNum(data.phone)) {
+    if (validator.validMobileNum(data.phone)) {
       return res.status(400).send({ status: false, message: "Enter a valid phone number" });
     }
 
-    if (validEmail(data.email)) {
+    if (validator.validEmail(data.email)) {
       return res.status(400).send({ status: false, message: "Enter a valid email-id" });
     }
 
-    if (validPwd(data.password)) {
+    if (validator.validPwd(data.password)) {
       return res.status(400).send({ status: false, message: "Password should be 8-15 characters long and must contain one of 0-9,A-Z,a-z and special characters" });
     }
 
-    let checkUniqueValues = await User.findOne({ $or: [{ phone: data.phone }, { email: data.email }] });
 
-    if (checkUniqueValues) {
-      return res.status(400).send({ status: false, message: "E-Mail or phone number already exist" });
+
+    // Cheking duplicate Entry Of User 
+    let duplicateEntries = await userModel.find();
+    let duplicateLength = duplicateEntries.length
+
+    if (duplicateLength != 0) {
+
+      // Checking duplicate phone
+      const duplicatePhone = await userModel.findOne({ phone: data.phone });
+      if (duplicatePhone) {
+        return res.status(400).send({ status: false, msg: "User phone number already exists" });
+      }
+
+      // Checking duplicate email
+      const duplicateEmail = await userModel.findOne({ email: data.email });
+      if (duplicateEmail) {
+        return res.status(400).send({ status: false, msg: "User emailId already exists" });
+      }
+
     }
 
     data.password = await bcrypt.hash(data.password, 10);
 
-    let userData = await User.create(data);
+    let userData = await userModel.create(data);
 
     res.status(201).send({ status: true, message: "User created successfully", data: userData });
 
@@ -75,10 +91,7 @@ const createUser = async (req, res) => {
 
 
 
-
-
-
-
+// ************************************************************ Post /login ************************************************************* //
 
 
 
@@ -87,7 +100,7 @@ const userLogin = async function (req, res) {
 
     let data = req.body;
 
-    if (checkData(data)) {
+    if (validator.isValidBody(data)) {
       return res.status(400).send({ status: false, message: "Enter user details" });
     }
 
@@ -103,24 +116,31 @@ const userLogin = async function (req, res) {
         .send({ status: false, message: "Password is required" });
     }
 
-    if (validEmail(data.email)) {
+    if (validator.validEmail(data.email)) {
       return res.status(400).send({ status: false, message: "Enter a valid email-id" });
     }
 
-    if (validPwd(data.password)) {
+    if (validator.validPwd(data.password)) {
       return res.status(400).send({ status: false, message: "Enter a valid password" });
     }
 
-    const checkValidUser = await User.findOne({ email: data.email });
+    const checkValidUser = await userModel.findOne({ email: data.email });
 
     if (!checkValidUser) {
       return res
         .status(401)
-        .send({ status: false, msg: "Email Id already exists" });
+        .send({ status: false, msg: "Email Id is not correct " });
     }
 
+
     let checkPassword = await bcrypt.compare(data.password, checkValidUser.password);
-    if (!checkPassword) return res.status(401).send({ status: false, msg: "Password is not correct" });
+
+    if (!checkPassword) {
+      return res
+        .status(401)
+        .send({ status: false, msg: "Password is not correct" });
+    }
+
 
     let token = jwt.sign(
       {

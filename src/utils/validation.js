@@ -6,7 +6,7 @@ const isValid = function (value) {
   return true;
 }
 
-const checkData = (object) => {
+const  isValidBody = (object) => {
   if (Object.keys(object).length > 0) {
     return false
   } else {
@@ -62,4 +62,4 @@ const isValidobjectId = (objectId) => {
 
 
 
-module.exports = { isValid, checkData, validTitle, validString, validMobileNum, validEmail, validPwd, isValidobjectId };
+module.exports = { isValid, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidobjectId };
