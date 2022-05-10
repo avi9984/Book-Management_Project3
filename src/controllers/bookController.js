@@ -160,31 +160,25 @@ const updateBook = async (req, res) => {
   }
 }
 
-const deletebook = async function (req, res) {
+const deleteBook = async function (req, res) {
   try {
       const bookId = req.params.bookId;
-      const book = await bookModel.findById(bookId);
+      const book = await Book.findById(bookId);
 
       if (!book) {
           return res.status(404).send({status: false,msg:"No such book exists"});
       }
 
       if (book.isDeleted == true) {
-          return res.status(400).send({ status: false, msg: "book has already been deleted" })
+          return res.status(404).send({ status: false, msg: "Book has already been deleted" })
       }
 
-      const userId = book.userId;
-      const id = req.userId;
-      if (id != userId) {
-          return res.status(403).send({ status: false, msg: "Not authorized..!" });
-      }
-
-      const deletedtedUser = await bookModel.findOneAndUpdate({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} }, { new: true });
-      res.status(200).send({status: true, msg: "book deleted successfully", data: deletedtedUser });
+      await Book.updateOne({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} }, { new: true });
+      res.status(200).send({status: true, msg: "Book deleted successfully"});
   }
   catch (err) {
-      res.status(500).send({status: false, msg: "Error", error: err.message })
+      res.status(500).send({status: false, error: err.message })
   }
 }
 
-module.exports = { getFilteredBooks, getBookById, createBook, updateBook, deletebook };
+module.exports = { getFilteredBooks, getBookById, createBook, updateBook, deleteBook };
