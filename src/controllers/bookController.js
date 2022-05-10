@@ -160,4 +160,31 @@ const updateBook = async (req, res) => {
   }
 }
 
-module.exports = { getFilteredBooks, getBookById, createBook, updateBook };
+const deletebook = async function (req, res) {
+  try {
+      const bookId = req.params.bookId;
+      const book = await bookModel.findById(bookId);
+
+      if (!book) {
+          return res.status(404).send({status: false,msg:"No such book exists"});
+      }
+
+      if (book.isDeleted == true) {
+          return res.status(400).send({ status: false, msg: "book has already been deleted" })
+      }
+
+      const userId = book.userId;
+      const id = req.userId;
+      if (id != userId) {
+          return res.status(403).send({ status: false, msg: "Not authorized..!" });
+      }
+
+      const deletedtedUser = await bookModel.findOneAndUpdate({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} }, { new: true });
+      res.status(200).send({status: true, msg: "book deleted successfully", data: deletedtedUser });
+  }
+  catch (err) {
+      res.status(500).send({status: false, msg: "Error", error: err.message })
+  }
+}
+
+module.exports = { getFilteredBooks, getBookById, createBook, updateBook, deletebook };
