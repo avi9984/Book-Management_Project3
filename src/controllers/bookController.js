@@ -2,58 +2,62 @@ const Book = require('../models/bookModel');
 const User = require('../models/userModel')
 const { isValidBody, isValidObjectId, validString } = require('../utils/validation');
 
+const currentFullDate = () => {
+  let timestamps = new Date()
+  return timestamps.getFullYear() + "-" + (timestamps.getMonth() + 1) + "-" + timestamps.getDate()
+}  
+
 const createBook = async function (req, res) {
   try {
     let data = req.body;
     if (isValidBody(data)) {
-      return res.status(400).send({ status: false, msg: "Enter Valid Book details" });
+      return res.status(400).send({ status: false, message: "Enter Valid Book details" });
     }
 
     if (!data.title) {
-      return res.status(400).send({ status: false, msg: "Book title is required" });
+      return res.status(400).send({ status: false, message: "Book title is required" });
     }
 
     if (!data.excerpt) {
-      return res.status(400).send({ status: false, msg: "Excerpt is required" });
+      return res.status(400).send({ status: false, message: "Excerpt is required" });
     }
 
     if (!data.ISBN) {
-      return res.status(400).send({ status: false, msg: "ISBN number is required" });
+      return res.status(400).send({ status: false, message: "ISBN number is required" });
     }
 
     if (!data.category) {
-      return res.status(400).send({ status: false, msg: "category is required" });
+      return res.status(400).send({ status: false, message: "category is required" });
     }
 
     if (!data.subcategory) {
-      return res.status(400).send({ status: false, msg: "subcategory is required" });
+      return res.status(400).send({ status: false, message: "subcategory is required" });
     }
 
     if (!data.userId) {
-      return res.status(400).send({ status: false, msg: "UserId is required" })
+      return res.status(400).send({ status: false, message: "UserId is required" })
     }
 
     let availableUserId = await User.findById(data.userId)
     if (!availableUserId) {
-      return res.status(404).send({ status: false, msg: "User not found" })
+      return res.status(404).send({ status: false, message: "User not found" })
     }
 
     if (validString(data.excerpt) || validString(data.category) || validString(data.subcategory)) {
-      return res.status(400).send({ status: false, msg: "data should not contain Numbers" })
+      return res.status(400).send({ status: false, message: "data should not contain Numbers" })
     }
 
     let checkUniqueValue = await Book.findOne({ $or: [{ title: data.title }, { ISBN: data.ISBN }] })
     if (checkUniqueValue) {
-      return res.status(400).send({ status: false, msg: "title or ISBN already exist" })
+      return res.status(400).send({ status: false, message: "title or ISBN already exist" })
     }
 
-    let timestamps = new Date()
-    data.releasedAt = timestamps.getFullYear() + "-" + (timestamps.getMonth() + 1) + "-" + timestamps.getDate()
+    data.releasedAt = currentFullDate();
 
     let createBook = await Book.create(data)
-    res.status(201).send({ status: true, msg: "Book Created Successfully", data: createBook })
+    res.status(201).send({ status: true, message: "Book Created Successfully", data: createBook })
   } catch (err) {
-    res.status(500).send({ msg: err.massage });
+    res.status(500).send({ status: false, error: err.message });
   }
 };
 
@@ -110,4 +114,43 @@ const getBookById = async (req, res) => {
   }
 }
 
-module.exports = { getFilteredBooks, getBookById, createBook };
+const updateBook = async (req, res) => {
+  try {
+    let bookId = req.params.bookId
+    if(!bookId) return res.status(400).send({ status: false, message: "Book Id is required" });
+
+    let checkBookId = await Book.findById(bookId);
+    if(!checkBookId) return res.status(404).send({ status: false, message: "Book not found" });
+
+    if(checkBookId.isDeleted == true) return res.status(404).send({ status: false, message: "Book not found or might have been deleted" });
+
+    let data = req.body;
+    if(isValidBody(data)) return res.status(400).send({ status: false, message: "Data is required to update document" });
+
+    if(data.hasOwnProperty('userId') || data.hasOwnProperty('reviews') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('deletedAt')) return res.status(403).send({ status: false, message: 'Action is Forbidden' });
+
+    if(data.hasOwnProperty('title') || data.hasOwnProperty('ISBN')) {
+      let checkUniqueValue = await Book.findOne({ $or: [{ title: data.title }, { ISBN: data.ISBN }] })
+
+      if (checkUniqueValue) return res.status(400).send({ status: false, message: "Title or ISBN already exist" })
+    }
+
+    if (validString(data.excerpt) || validString(data.category) || validString(data.subcategory)) {
+      return res.status(400).send({ status: false, message: "Data should not contain Numbers" })
+    }
+    
+    data.releasedAt = currentFullDate()
+
+    let updatedBookData = await Book.findByIdAndUpdate(
+      {_id: bookId },
+      data,
+      {new: true}
+    )
+    res.send({ status: true, message: "Success", data: updatedBookData })
+
+  } catch (err) {
+    res.status(500).send({ status: false, message: err.message })
+  }
+}
+
+module.exports = { getFilteredBooks, getBookById, createBook, updateBook };

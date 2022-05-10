@@ -1,6 +1,6 @@
 const express = require('express');
 const { createUser, userLogin } = require('../controllers/userController');
-const { createBook, getFilteredBooks, getBookById } = require('../controllers/bookController');
+const { createBook, getFilteredBooks, getBookById, updateBook } = require('../controllers/bookController');
 const { authentication, authorization } = require('../middleware/auth');
 
 const router = express.Router();
@@ -13,5 +13,6 @@ router.post('/login', userLogin);
 router.post('/books', authentication, authorization, createBook);
 router.get('/books', authentication, getFilteredBooks);
 router.get('/books/:bookId', authentication, getBookById);
+router.put('/books/:bookId', authentication, authorization, updateBook);
 
 module.exports = router
