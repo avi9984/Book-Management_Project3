@@ -6,7 +6,7 @@ const isValid = function (value) {
   return true;
 }
 
-const checkData = (object) => {
+const  isValidBody = (object) => {
   if (Object.keys(object).length > 0) {
     return false
   } else {
