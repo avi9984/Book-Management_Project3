@@ -8,6 +8,8 @@ const currentFullDate = () => {
 }  
 
 const createBook = async function (req, res) {
+
+
   try {
     let data = req.body;
     if (isValidBody(data)) {
@@ -61,6 +63,8 @@ const createBook = async function (req, res) {
   }
 };
 
+
+
 const getFilteredBooks = async (req, res) => {
   try {
     let data = req.query;
@@ -96,6 +100,9 @@ const getFilteredBooks = async (req, res) => {
     res.status(500).send({ status: false, message: err.message })
   }
 }
+
+
+
 
 const getBookById = async (req, res) => {
   try {
