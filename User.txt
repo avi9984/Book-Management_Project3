@@ -15,10 +15,10 @@ Create User:
 
 2. {
     "title": "Mr",
-    "name": "Neeraj Pal",
+    "name": "Chetan Bhagat",
     "phone": 6234567890,
-    "email": "neeraj@mailinator.com", 
-    "password": "Abcd@1234567",
+    "email": "chetan@mailinator.com", 
+    "password": "Chetan@1234567",
     "address": {
         "street": "110, Ridhi Sidhi Tower",
         "city": "Jaipur",
@@ -26,6 +26,18 @@ Create User:
     }
 }
 
+3. {
+    "title": "Mr",
+    "name": "J.K Rowling",
+    "phone": "9676543456",
+    "email": "rowling@mailinator.com",
+    "password": "Rowling@1234567",
+    "address": {
+    "street": "Morningside Road",
+    "city": "Scotland",
+    "pincode": "932325"
+  }
+}
 
 Login user:-
 

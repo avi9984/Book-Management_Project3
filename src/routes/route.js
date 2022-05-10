@@ -7,7 +7,7 @@ const router = express.Router();
 
 //Users API
 router.post('/register', createUser);
-router.post('/login', auth, userLogin);
+router.post('/login', userLogin);
 
 //Books API
 router.post('/books', authentication, authorization, createBook);
