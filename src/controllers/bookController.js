@@ -1,11 +1,11 @@
 const Book = require('../models/bookModel');
 const User = require('../models/userModel')
-const { checkData, isValidObjectId, validString } = require('../utils/validation');
+const { isValidBody, isValidObjectId, validString } = require('../utils/validation');
 
 const createBook = async function (req, res) {
   try {
     let data = req.body;
-    if (checkData(data)) {
+    if (isValidBody(data)) {
       return res.status(400).send({ status: false, msg: "Enter Valid Book details" });
     }
 
@@ -74,7 +74,7 @@ const getFilteredBooks = async (req, res) => {
       if (validString(checkValues)) return res.status(400).send({ status: false, message: "Filter data should not contain numbers excluding user id" })
     }
 
-    if (checkData(data)) {
+    if (isValidBody(data)) {
       let getBooks = await Book.find({ isDeleted: false }).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
       if (getBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });

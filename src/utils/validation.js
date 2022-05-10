@@ -62,4 +62,4 @@ const isValidObjectId = (objectId) => {
 
 
 
-module.exports = { isValid, checkData, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId };
+module.exports = { isValid, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId };
