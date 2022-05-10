@@ -8,12 +8,10 @@ const currentFullDate = () => {
 }  
 
 const createBook = async function (req, res) {
-
-
   try {
     let data = req.body;
     if (isValidBody(data)) {
-      return res.status(400).send({ status: false, message: "Enter Valid Book details" });
+      return res.status(400).send({ status: false, message: "Enter Book details" });
     }
 
     if (!data.title) {
@@ -170,11 +168,11 @@ const deleteBook = async function (req, res) {
       }
 
       if (book.isDeleted == true) {
-          return res.status(404).send({ status: false, msg: "Book has already been deleted" })
+          return res.status(404).send({ status: false, msg: "Book not found or has already been deleted" })
       }
 
-      await Book.updateOne({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} }, { new: true });
-      res.status(200).send({status: true, msg: "Book deleted successfully"});
+      await Book.updateOne({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} });
+      res.status(200).send({status: true, message: "Book deleted successfully"});
   }
   catch (err) {
       res.status(500).send({status: false, error: err.message })
