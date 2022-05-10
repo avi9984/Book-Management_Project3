@@ -166,11 +166,10 @@ const deleteBook = async function (req, res) {
       if (!book) {
           return res.status(404).send({status: false,msg:"No such book exists"});
       }
-
       if (book.isDeleted == true) {
           return res.status(404).send({ status: false, msg: "Book not found or has already been deleted" })
       }
-
+      
     await Book.updateOne({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} });
     res.status(200).send({status: true, message: "Book deleted successfully"});
   }
