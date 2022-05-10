@@ -29,15 +29,3 @@ Create User:
 
 Login user:-
 
-1. {
-    "email": "johndoe@mailinator.com",
-    "password": "Abcd@1234567"
-}
-
-2. {
-    "email": "neeraj@mailinator.com",
-    "password": "Abcd@1234567",
-    -------------------Token expires at 10 May 7.30 pm------------------
-    "token": eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Mjc5MWVjZmY2NTJmZGE3ODhlMzk2N2YiLCJpYXQiOjE2NTIxMDUxMzMsImV4cCI6MTY1MjE5MTUzM30.MQ_g30Dyh5rCv9g-lMxdA0byc9k-DvlP5cv-RqsCA0w
-} 
-
