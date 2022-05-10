@@ -73,15 +73,6 @@ const createUser = async (req, res) => {
 
 };
 
-
-
-
-
-
-
-
-
-
 const userLogin = async function (req, res) {
   try {
 
@@ -126,7 +117,7 @@ const userLogin = async function (req, res) {
       {
         userId: checkValidUser._id.toString(),
         iat: Math.floor(Date.now() / 1000), //issue date
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 //expiry date
+        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24//expiries in 1 hr
       },
       "Books-Management"
     );

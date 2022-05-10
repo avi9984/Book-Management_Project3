@@ -16,7 +16,7 @@ const BooksSchema = new mongoose.Schema({
     },
     userId: {
         type: ObjectId,
-        ref: 'newUser',
+        ref: 'User',
         required: true,
         trim: true
     },
@@ -49,8 +49,6 @@ const BooksSchema = new mongoose.Schema({
 
     deletedAt: {
         type: Date,
-        default: null
-
     },
 
     isDeleted: {
@@ -59,10 +57,8 @@ const BooksSchema = new mongoose.Schema({
     },
 
     releasedAt: {
-
-        type: Date,
+        type: String,
         required: true,
-        // default: Date.now(),
     }
 
 

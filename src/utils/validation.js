@@ -56,10 +56,10 @@ const validPwd = (Password) => {
   }
 };
 
-const isValidobjectId = (objectId) => {
+const isValidObjectId = (objectId) => {
   return mongoose.Types.ObjectId.isValid(objectId)
 };
 
 
 
-module.exports = { isValid, checkData, validTitle, validString, validMobileNum, validEmail, validPwd, isValidobjectId };
+module.exports = { isValid, checkData, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId };
