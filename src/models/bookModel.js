@@ -16,7 +16,7 @@ const BooksSchema = new mongoose.Schema({
     },
     userId: {
         type: ObjectId,
-        ref: 'newUser',
+        ref: 'User',
         required: true,
         trim: true
     },
