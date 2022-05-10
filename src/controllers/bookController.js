@@ -38,7 +38,7 @@ const createBook = async function (req, res) {
       return res.status(404).send({ status: false, msg: "User not found" })
     }
 
-    if (validString(data.title) || validString(data.excerpt) || validString(data.category) || validString(data.subcategory)) {
+    if (validString(data.excerpt) || validString(data.category) || validString(data.subcategory)) {
       return res.status(400).send({ status: false, msg: "data should not contain Numbers" })
     }
 
