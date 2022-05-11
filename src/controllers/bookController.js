@@ -1,7 +1,7 @@
 const Book = require('../models/bookModel');
 const User = require('../models/userModel');
 const Review = require('../models/reviewModel');
-const { isValidBody, isValidObjectId, validString, validDate } = require('../utils/validation');
+const { isValidBody, isValidObjectId, validString, validDate, validISBN } = require('../utils/validation');
 
 
 const createBook = async function (req, res) {
@@ -45,7 +45,7 @@ const createBook = async function (req, res) {
     }
 
     if (validString(data.excerpt) || validString(data.category) || validString(data.subcategory)) {
-      return res.status(400).send({ status: false, message: "data should not contain Numbers" })
+      return res.status(400).send({ status: false, message: "Data should be valid and does not contains numbers" })
     }
 
     let checkUniqueValue = await Book.findOne({ $or: [{ title: data.title }, { ISBN: data.ISBN }] })
@@ -55,6 +55,10 @@ const createBook = async function (req, res) {
 
     if(validDate(data.releasedAt)) {
       return res.status(400).send({ status: false, message: "Enter a valid released date in (YYYY-MM-DD) formate" })
+    }
+
+    if(validISBN(data.ISBN)) {
+      return res.status(400).send({ status: false, message: "Enter a valid ISBN number" })
     }
 
     let createBook = await Book.create(data)
@@ -89,15 +93,10 @@ const getFilteredBooks = async (req, res) => {
 
       if (validString(checkValues)) return res.status(400).send({ status: false, message: "Filter data should not contain numbers excluding user id" })
     }
-    
-    data.isDeleted = false;
-    let { userId, category, subcategory } = data
 
-    let getFilterBooks = await Book.find({
-      userId: userId,
-      category: category,
-      $inc: [subcategory],
-    }).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
+    data.isDeleted = false;
+
+    let getFilterBooks = await Book.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
     if (getFilterBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
     res.status(200).send({ status: true, message: "Books list", data: getFilterBooks });
@@ -121,11 +120,9 @@ const getBookById = async (req, res) => {
 
     let getReviews = await Review.find({ bookId: getBook._id, isDeleted: false }).select({ isDeleted: 0, __v: 0, createdAt: 0, updatedAt: 0 });
 
-    let { ...responseData } = getBook._doc;
-    responseData.reviewsData = getReviews
+    getBook._doc.reviewsData = getReviews
 
-
-    res.status(200).send({ status: true, message: "Books list", data: responseData })
+    res.status(200).send({ status: true, message: "Books list", data: getBook })
   } catch (err) {
     res.status(500).send({ status: false, message: err.message })
   }
@@ -150,12 +147,20 @@ const updateBook = async (req, res) => {
 
     if(data.hasOwnProperty('userId') || data.hasOwnProperty('reviews') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('deletedAt')) return res.status(403).send({ status: false, message: 'Action is Forbidden' });
 
-    if(data.hasOwnProperty('title') || data.hasOwnProperty('ISBN')) {
-      let checkUniqueValue = await Book.findOne({ $or: [{ title: data.title }, { ISBN: data.ISBN }] })
+    if(data.hasOwnProperty('title')) {
+      let checkUniqueValue = await Book.findOne({ title: data.title })
 
-      if (checkUniqueValue) return res.status(400).send({ status: false, message: "Title or ISBN already exist" })
+      if (checkUniqueValue) return res.status(400).send({ status: false, message: "Title already exist" })
     }
+    if(data.hasOwnProperty('ISBN')) {
+      if(validISBN(data.ISBN)) {
+        return res.status(400).send({ status: false, message: "Enter a valid ISBN number" })
+      }
+      let checkUniqueValue = await Book.findOne({ ISBN: data.ISBN  })
 
+      if (checkUniqueValue) return res.status(400).send({ status: false, message: "ISBN already exist" })
+    }
+  
     if (validString(data.excerpt) || validString(data.category) || validString(data.subcategory)) {
       return res.status(400).send({ status: false, message: "Data should not contain Numbers" })
     }

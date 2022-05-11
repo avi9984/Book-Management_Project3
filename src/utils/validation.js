@@ -68,4 +68,12 @@ const validDate = (date) => { //Check
   }
 }
 
-module.exports = { isValid, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId, validDate };
+const validISBN = (number) => {
+  if(/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(number)){
+    return false;
+  }else {
+    return true;
+  }
+}
+
+module.exports = { isValid, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId, validDate, validISBN };

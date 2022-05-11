@@ -38,6 +38,7 @@ const BooksSchema = new mongoose.Schema({
 
     subcategory: {
         type: [String],
+        required: true,
         trim: true
     },
 
