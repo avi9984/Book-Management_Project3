@@ -58,7 +58,7 @@ const updateReview = async (req, res) => {
     let data = req.body;
     if(isValidBody(data)) return res.status(400).send({ status: false, message: "Data is required to update document" });
 
-    if(data.hasOwnProperty('bookId') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('reviewedAt')) return res.status(403).send({ status: false, message: 'Action is Forbidden' });
+    if(data.hasOwnProperty('bookId') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('reviewedAt')) return res.status(400).send({ status: false, message: 'Action is Forbidden' });
 
     if (validString(data.reviewedBy) || validString(data.review)) {
       return res.status(400).send({ status: false, message: "Enter valid data in review and reviewedBy" })

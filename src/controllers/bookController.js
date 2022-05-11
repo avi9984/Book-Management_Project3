@@ -145,7 +145,7 @@ const updateBook = async (req, res) => {
       return res.status(400).send({ status: false, message: "ReleasedAt date is required" })
     }
 
-    if(data.hasOwnProperty('userId') || data.hasOwnProperty('reviews') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('deletedAt')) return res.status(403).send({ status: false, message: 'Action is Forbidden' });
+    if(data.hasOwnProperty('userId') || data.hasOwnProperty('reviews') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('deletedAt')) return res.status(400).send({ status: false, message: 'Action is Forbidden' });
 
     if(data.hasOwnProperty('title')) {
       let checkUniqueValue = await Book.findOne({ title: data.title })
