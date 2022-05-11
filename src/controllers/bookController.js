@@ -85,7 +85,7 @@ const getFilteredBooks = async (req, res) => {
       if (!isValidObjectId(data.userId)) return res.status(400).send({ status: false, message: "Enter a valid user id" });
       let { ...tempData } = data;
       delete (tempData.userId);
-      let checkValues = Object.values(tempData);
+      let checkValues = Object.values(tempData); 
 
       if (validString(checkValues)) return res.status(400).send({ status: false, message: "Filter data should not contain numbers excluding user id" })
     } else {
@@ -193,7 +193,7 @@ const deleteBook = async function (req, res) {
           return res.status(404).send({ status: false, msg: "Book not found or has already been deleted" })
       }
       
-    await Book.updateOne({ _id: bookId }, { $set: { isDeleted: true ,deletedAt: Date.now()} });
+    await Book.updateOne({ _id: bookId }, { isDeleted: true ,deletedAt: Date.now()} );
     res.status(200).send({status: true, message: "Book deleted successfully"});
   }
   catch (err) {
