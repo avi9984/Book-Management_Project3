@@ -1,11 +1,8 @@
 const Book = require('../models/bookModel');
-const User = require('../models/userModel')
-const { isValidBody, isValidObjectId, validString } = require('../utils/validation');
+const User = require('../models/userModel');
+const Review = require('../models/reviewModel');
+const { isValidBody, isValidObjectId, validString, validDate } = require('../utils/validation');
 
-const currentFullDate = () => {
-  let timestamps = new Date()
-  return timestamps.getFullYear() + "-" + (timestamps.getMonth() + 1) + "-" + timestamps.getDate()
-}  
 
 const createBook = async function (req, res) {
   try {
@@ -37,6 +34,10 @@ const createBook = async function (req, res) {
     if (!data.userId) {
       return res.status(400).send({ status: false, message: "UserId is required" })
     }
+    
+    if (!data.releasedAt) {
+      return res.status(400).send({ status: false, message: "ReleasedAt date is required" })
+    }
 
     let availableUserId = await User.findById(data.userId)
     if (!availableUserId) {
@@ -52,7 +53,9 @@ const createBook = async function (req, res) {
       return res.status(400).send({ status: false, message: "title or ISBN already exist" })
     }
 
-    data.releasedAt = currentFullDate();
+    if(validDate(data.releasedAt)) {
+      return res.status(400).send({ status: false, message: "Enter a valid released date in (YYYY-MM-DD) formate" })
+    }
 
     let createBook = await Book.create(data)
     res.status(201).send({ status: true, message: "Book Created Successfully", data: createBook })
@@ -67,6 +70,13 @@ const getFilteredBooks = async (req, res) => {
   try {
     let data = req.query;
 
+    if (isValidBody(data)) {
+      let getBooks = await Book.find({ isDeleted: false }).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
+
+      if (getBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
+      return res.status(200).send({ status: true, message: "Books list", data: getBooks });
+    }
+
     if (data.hasOwnProperty('userId')) {
       if (!isValidObjectId(data.userId)) return res.status(400).send({ status: false, message: "Enter a valid user id" });
       let { ...tempData } = data;
@@ -80,19 +90,11 @@ const getFilteredBooks = async (req, res) => {
       if (validString(checkValues)) return res.status(400).send({ status: false, message: "Filter data should not contain numbers excluding user id" })
     }
 
-    if (isValidBody(data)) {
-      let getBooks = await Book.find({ isDeleted: false }).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
-
-      if (getBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
-      return res.status(200).send({ status: true, message: "Books list", data: getBooks });
-    }
-
     data.isDeleted = false;
 
     let getFilterBooks = await Book.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
     if (getFilterBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
-
     res.status(200).send({ status: true, message: "Books list", data: getFilterBooks });
   } catch (err) {
     res.status(500).send({ status: false, message: err.message })
@@ -110,10 +112,15 @@ const getBookById = async (req, res) => {
     let getBook = await Book.findById(bookId).select({ __v: 0 });
     if (!getBook) return res.status(404).send({ status: false, message: "No book found" })
 
-    let { ...data } = getBook._doc;
-    data.reviewsData = [];
+    if(getBook.isDeleted == true) return res.status(404).send({ status: false, message: "Book not found or have already been deleted" })
 
-    res.status(200).send({ status: true, message: "Books list", data: data })
+    let getReviews = await Review.find({ bookId: getBook._id, isDeleted: false }).select({ isDeleted: 0, __v: 0, createdAt: 0, updatedAt: 0 });
+
+    let { ...responseData } = getBook._doc;
+    responseData.reviewsData = getReviews
+
+
+    res.status(200).send({ status: true, message: "Books list", data: responseData })
   } catch (err) {
     res.status(500).send({ status: false, message: err.message })
   }
@@ -132,6 +139,10 @@ const updateBook = async (req, res) => {
     let data = req.body;
     if(isValidBody(data)) return res.status(400).send({ status: false, message: "Data is required to update document" });
 
+    if (!data.releasedAt) {
+      return res.status(400).send({ status: false, message: "ReleasedAt date is required" })
+    }
+
     if(data.hasOwnProperty('userId') || data.hasOwnProperty('reviews') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('deletedAt')) return res.status(403).send({ status: false, message: 'Action is Forbidden' });
 
     if(data.hasOwnProperty('title') || data.hasOwnProperty('ISBN')) {
@@ -144,7 +155,9 @@ const updateBook = async (req, res) => {
       return res.status(400).send({ status: false, message: "Data should not contain Numbers" })
     }
     
-    data.releasedAt = currentFullDate()
+    if(validDate(data.releasedAt)) {
+      return res.status(400).send({ status: false, message: "Enter a valid released date in (YYYY-MM-DD) formate" })
+    }
 
     let updatedBookData = await Book.findByIdAndUpdate(
       {_id: bookId },
