@@ -70,17 +70,15 @@ const updateReview = async (req, res) => {
       if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
     }
     
-    
-
-    let updatedReview = await Review.findByIdAndUpdate(
+    await Review.findByIdAndUpdate(
       {_id: getID.reviewId},
       data,
-      {new: true}
-    ).select({ isDeleted: 0, __v: 0, createdAt: 0, updatedAt: 0 })
+    )
 
+    let getReviews = await Review.find({ bookId: getID.bookId, isDeleted: false }).select({ isDeleted: 0, __v: 0, createdAt: 0, updatedAt: 0 });
     let getBook = await Book.findById(getID.bookId).select({ __v: 0 });
 
-    getBook._doc.reviewData = updatedReview
+    getBook._doc.reviewData = getReviews
  
     res.status(200).send({ status: true, message: "Book list", data: getBook }); 
   } catch (err) {
