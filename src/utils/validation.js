@@ -61,7 +61,7 @@ const isValidObjectId = (objectId) => {
 };
 
 const validDate = (date) => { //Check
-  if(/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  if(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/.test(date)) {
     return false;
   }else {
     return true;

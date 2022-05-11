@@ -89,10 +89,15 @@ const getFilteredBooks = async (req, res) => {
 
       if (validString(checkValues)) return res.status(400).send({ status: false, message: "Filter data should not contain numbers excluding user id" })
     }
-
+    
     data.isDeleted = false;
-    //sub category is array
-    let getFilterBooks = await Book.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
+    let { userId, category, subcategory } = data
+
+    let getFilterBooks = await Book.find({
+      userId: userId,
+      category: category,
+      $inc: [subcategory],
+    }).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
     if (getFilterBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
     res.status(200).send({ status: true, message: "Books list", data: getFilterBooks });

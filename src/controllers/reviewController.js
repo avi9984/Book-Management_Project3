@@ -82,7 +82,7 @@ const updateReview = async (req, res) => {
     let { ...responseData } = getBook._doc;
     responseData.reviewData = updatedReview
  
-    res.status(200).send({ status: true, message: "Book list", data: responseData });
+    res.status(200).send({ status: true, message: "Book list", data: responseData }); //only one review or all
   } catch (err) {
     res.status(500).send({ status: false, error: err.message });
   }
