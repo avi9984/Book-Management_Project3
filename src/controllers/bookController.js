@@ -91,7 +91,7 @@ const getFilteredBooks = async (req, res) => {
     }
 
     data.isDeleted = false;
-
+    //sub category is array
     let getFilterBooks = await Book.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
     if (getFilterBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });

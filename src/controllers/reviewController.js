@@ -66,8 +66,10 @@ const updateReview = async (req, res) => {
 
     if(data.hasOwnProperty('rating')){
       if(!validString(data.rating)) return res.status(400).send({ status: false, message: "Rating should be in numbers" });
+
+      if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
     }
-    if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
+    
 
     let updatedReview = await Review.findByIdAndUpdate(
       {_id: getID.reviewId},
