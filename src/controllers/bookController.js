@@ -11,6 +11,10 @@ const createBook = async function (req, res) {
       return res.status(400).send({ status: false, message: "Enter Book details" });
     }
 
+    if(data.hasOwnProperty('reviews')) {
+      return res.status(400).send({ status: false, message: "Cannot edit review" });
+    }
+
     if (!data.title) {
       return res.status(400).send({ status: false, message: "Book title is required" });
     }

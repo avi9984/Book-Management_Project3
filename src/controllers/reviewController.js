@@ -32,7 +32,7 @@ const addReview = async (req, res) => {
     data.bookId = bookId;
 
     let reviewData = await Review.create(data) ;
-    await Book.findByIdAndUpdate(
+    await Book.updateOne(
       {_id: bookId},
       {$inc: {reviews: 1}}
     )
@@ -70,17 +70,13 @@ const updateReview = async (req, res) => {
       if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
     }
     
-    await Review.findByIdAndUpdate(
+    let updatedReview = await Review.findByIdAndUpdate(
       {_id: getID.reviewId},
       data,
+      {new: true}
     )
-
-    let getReviews = await Review.find({ bookId: getID.bookId, isDeleted: false }).select({ isDeleted: 0, __v: 0, createdAt: 0, updatedAt: 0 });
-    let getBook = await Book.findById(getID.bookId).select({ __v: 0 });
-
-    getBook._doc.reviewData = getReviews
  
-    res.status(200).send({ status: true, message: "Book list", data: getBook }); 
+    res.status(200).send({ status: true, message: "Review updated successfully", data: updatedReview }); 
   } catch (err) {
     res.status(500).send({ status: false, error: err.message });
   }
@@ -98,11 +94,11 @@ const deleteReview = async (req, res) => {
 
     if(checkID.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
 
-    await Review.findByIdAndUpdate(
+    await Review.updateOne(
       {_id: getID.reviewId},
       { isDeleted: true }
     )
-    await Book.findByIdAndUpdate(
+    await Book.updateOne(
       {_id: getID.bookId},
       {$inc: {reviews: -1}}
     )
