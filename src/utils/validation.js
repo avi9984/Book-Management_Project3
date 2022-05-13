@@ -76,12 +76,11 @@ const validDate = (date) => { //Check (/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]
   }
 }
 
-const validISBN = (number) => {
-  if(/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(number)){
-    return false;
-  }else {
-    return true;
+const validISBN = function (value) {
+  if (!(/^(?:ISBN(?:-1[03])?:? )?(?=[-0-9 ]{17}$|[-0-9X ]{13}$|[0-9X]{10}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?(?:[0-9]+[- ]?){2}[0-9X]$/.test(value.trim()))) {
+    return false
   }
-}
+  return true
+};
 
 module.exports = { isValid, isValidObjectType, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId, validDate, validISBN };

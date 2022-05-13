@@ -109,7 +109,7 @@ const getFilteredBooks = async (req, res) => {
       let getBooks = await Book.find({ isDeleted: false }).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
       if (getBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
-      return res.status(200).send({ status: true, message: "Books list", data: getBooks });
+      return res.status(200).send({ status: true, count: getBooks.length, message: "Books list", data: getBooks });
     }
 
     if (data.hasOwnProperty('userId')) {
@@ -130,7 +130,7 @@ const getFilteredBooks = async (req, res) => {
     let getFilterBooks = await Book.find(data).sort({ title: 1 }).select({ title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1 });
 
     if (getFilterBooks.length == 0) return res.status(404).send({ status: false, message: "No books found" });
-    res.status(200).send({ status: true, message: "Books list", data: getFilterBooks });
+    res.status(200).send({ status: true, count: getFilterBooks.length, message: "Books list", data: getFilterBooks });
   } catch (err) {
     res.status(500).send({ status: false, message: err.message })
   }
@@ -156,7 +156,7 @@ const getBookById = async (req, res) => {
 
     getBook._doc.reviewsData = getReviews
 
-    res.status(200).send({ status: true, message: "Books list", data: getBook })
+    res.status(200).send({ status: true, count: getReviews.length, message: "Books list", data: getBook })
   } catch (err) {
     res.status(500).send({ status: false, message: err.message })
   }
