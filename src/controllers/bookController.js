@@ -197,7 +197,8 @@ const deleteBook = async function (req, res) {
           return res.status(404).send({ status: false, msg: "Book not found or has already been deleted" })
       }
       
-    await Book.updateOne({ _id: bookId }, { isDeleted: true ,deletedAt: Date.now()} );
+    await Book.updateOne({ _id: bookId }, { isDeleted: true ,deletedAt: Date.now(), reviews: 0} );
+    await Review.updateMany({bookId: bookId}, { isDeleted: true })
     res.status(200).send({status: true, message: "Book deleted successfully"});
   }
   catch (err) {
