@@ -1,8 +1,6 @@
 const Review = require('../models/reviewModel');
 const Book = require('../models/bookModel');
 const { isValidObjectId, isValidBody, validString } = require('../utils/validation');
-const { validate } = require('../models/bookModel');
-const { request } = require('express');
 
 // POST /books/:bookId/review
 const addReview = async (req, res) => {
