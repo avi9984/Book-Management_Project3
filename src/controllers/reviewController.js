@@ -29,22 +29,25 @@ const addReview = async (req, res) => {
       if(validString(data.reviewedBy)) return res.status(400).send({ status: false, message: "Name should not contain numbers" });
     }
     
+    //checking if data has valid data or not
     if (validString(data.reviewedBy) || validString(data.review)) {
       return res.status(400).send({ status: false, message: "Enter valid data in review and reviewedBy" })
     }
 
+    //Checking that rating should be only in numbers and between 1 to 5
     if(!validString(data.rating)) return res.status(400).send({ status: false, message: "Rating should be in numbers" });
     if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
 
     data.bookId = bookId;
 
+    //Updating the review
     let reviewData = await Review.create(data) ;
     await Book.updateOne(
       {_id: bookId},
       {$inc: {reviews: 1}}
     )
 
-    res.status(200).send({ status: true, message: "Success", data: reviewData })
+    res.status(201).send({ status: true, message: "Success", data: reviewData })
   } catch (err) {
     res.status(500).send({ status: false, error: err.message });
   }
@@ -63,18 +66,27 @@ const updateReview = async (req, res) => {
     // check valid reviewId
     if(!isValidObjectId(getID.reviewId)) return res.status(400).send({ status: false, message: "Enter a valid Review id" });
 
-    let checkID = await Review.findOne({ _id: getID.reviewId, bookId: getID.bookId });
-    if(!checkID) return res.status(404).send({ status: false, message: "Data not found, check ID's and try again" });
+   //Checking if review data exist or not
+   let checkReviewID = await Review.findById({ _id: getID.reviewId });
+   if(!checkReviewID) return res.status(404).send({ status: false, message: "Review not found check id and try again" });
 
+   //Checking if bookId data exist or not
+   let checkBookID = await Book.findById({ _id: getID.bookId });
+   if(checkBookID)  return res.status(404).send({ status: false, message: "Book not found check id and try again" });
+
+    //Checking if review is already deleted or not
     if(checkID.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
 
+    //getting the data from request body to update the review
     let data = req.body;
 
     // validate the body
     if(isValidBody(data)) return res.status(400).send({ status: false, message: "Data is required to update document" });
 
+    //checking if user tries to change attributes which he/she is not allowed to do it
     if(data.hasOwnProperty('bookId') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('reviewedAt')) return res.status(400).send({ status: false, message: 'Action is Forbidden' });
 
+    //checking if the data is a valid data
     if (validString(data.reviewedBy) || validString(data.review)) {
       return res.status(400).send({ status: false, message: "Enter valid data in review and reviewedBy" })
     }
@@ -87,6 +99,7 @@ const updateReview = async (req, res) => {
       if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
     }
     
+    //Updating the review
     let updatedReview = await Review.findByIdAndUpdate(
       {_id: getID.reviewId},
       data,
@@ -110,15 +123,24 @@ const deleteReview = async (req, res) => {
     // check valid reviewId
     if(!isValidObjectId(getID.reviewId)) return res.status(400).send({ status: false, message: "Enter a valid Review id" });
 
-    let checkID = await Review.findOne({ _id: getID.reviewId, bookId: getID.bookId });
-    if(!checkID) return res.status(404).send({ status: false, message: "Data not found, check ID's and try again" });
+    //Checking if review data exist or not
+    let checkReviewID = await Review.findById({ _id: getID.reviewId });
+    if(!checkReviewID) return res.status(404).send({ status: false, message: "Review not found check id and try again" });
 
+    //Checking if bookId data exist or not
+    let checkBookID = await Book.findById({ _id: getID.bookId });
+    if(checkBookID)  return res.status(404).send({ status: false, message: "Book not found check id and try again" });
+
+    //Checking if review is already deleted or not
     if(checkID.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
 
+    //Updating the review
     await Review.updateOne(
       {_id: getID.reviewId},
       { isDeleted: true }
     )
+
+    //Updating the reviews count in Book by decrease it by 1
     await Book.updateOne(
       {_id: getID.bookId},
       {$inc: {reviews: -1}}

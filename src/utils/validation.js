@@ -6,6 +6,14 @@ const isValid = function (value) {
   return true;
 }
 
+const isValidObjectType = (value) => {
+  if (typeof value === 'object' && Object.keys(value).length > 0) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 const  isValidBody = (object) => {
   if (Object.keys(object).length > 0) {
     return false
@@ -76,4 +84,4 @@ const validISBN = (number) => {
   }
 }
 
-module.exports = { isValid, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId, validDate, validISBN };
+module.exports = { isValid, isValidObjectType, isValidBody, validTitle, validString, validMobileNum, validEmail, validPwd, isValidObjectId, validDate, validISBN };

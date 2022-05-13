@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
-const { isValidBody, validTitle, validString, validMobileNum, validEmail, validISBN, validPwd } = require("../utils/validation");
+const { isValidBody, isValidObjectType, validTitle, validString, validMobileNum, validEmail, validISBN, validPwd } = require("../utils/validation");
 
 
 
@@ -80,15 +80,24 @@ const createUser = async (req, res) => {
       return res.status(400).send({ status: false, message: "Password should be 8-15 characters long and must contain one of 0-9,A-Z,a-z and special characters" });
     }
 
-
-
-    // Checking duplicate Entry Of User 
-    let duplicateEntries = await User.findOne({$or: [{ email: data.email },{ phone: data.phone }]});
-
-    if (duplicateEntries) {
-        return res.status(400).send({ status: false, msg: "User emailId or phone number already exists" });
+    if(data.hasOwnProperty('address')){
+      if(isValidObjectType(data.address)) return res.status(400).send({ status: false, message: "Enter address in a object with 'street','city' and 'pincode' as keys"})
     }
 
+
+    // Checking duplicate Entry Of User email 
+    let duplicateEmail = await User.findOne({ email: data.email });
+
+    if (duplicateEmail) {
+        return res.status(400).send({ status: false, message: "User email-Id already exists" });
+    }
+
+    // Checking duplicate Entry Of User phone number
+    let duplicatePhone = await User.findOne({ phone: data.phone });
+
+    if (duplicatePhone) {
+        return res.status(400).send({ status: false, message: "User phone number already exists" });
+    }
 
     //Password Encryption 
 
@@ -153,7 +162,7 @@ const userLogin = async function (req, res) {
     const checkValidUser = await User.findOne({ email: data.email });
 
     if (!checkValidUser) {
-      return res.status(401).send({ status: false, msg: "Email Id is not correct " });
+      return res.status(401).send({ status: false, message: "Email Id is not correct " });
     }
 
     //Password check
@@ -161,7 +170,7 @@ const userLogin = async function (req, res) {
     let checkPassword = await bcrypt.compare(data.password, checkValidUser.password);
 
     if (!checkPassword) {
-      return res.status(401).send({ status: false, msg: "Password is not correct" });
+      return res.status(401).send({ status: false, message: "Password is not correct" });
     }
 
     // token generation for the logged in user 
@@ -172,7 +181,7 @@ const userLogin = async function (req, res) {
 
     res.setHeader('x-api-key', token);
 
-    res.status(200).send({ status: true, msg: "Successfully Login", data: token });
+    res.status(200).send({ status: true, message: "Successfully Login", data: token });
 
   } catch (err) {
     res.status(500).send({ status: false, message: err.message });

@@ -69,9 +69,10 @@ const createBook = async function (req, res) {
       return res.status(400).send({ status: false, message: "Data should be valid and does not contains numbers" })
     }
 
-    let checkUniqueValue = await Book.findOne({ $or: [{ title: data.title }, { ISBN: data.ISBN }] })
-    if (checkUniqueValue) {
-      return res.status(400).send({ status: false, message: "title or ISBN already exist" })
+    //Checking for unique title
+    let checkUniqueTitle = await Book.findOne({ title: data.title })
+    if (checkUniqueTitle) {
+      return res.status(400).send({ status: false, message: "Title already exist" })
     }
 
     // validate the releasedAt
@@ -82,6 +83,12 @@ const createBook = async function (req, res) {
     // validate the ISBN
     if(validISBN(data.ISBN)) {
       return res.status(400).send({ status: false, message: "Enter a valid ISBN number" })
+    }
+
+    //Checking for unique title
+    let checkUniqueISBN = await Book.findOne({ ISBN: data.ISBN })
+    if (checkUniqueISBN) {
+      return res.status(400).send({ status: false, message: "ISBN already exist" })
     }
 
     let createBook = await Book.create(data)
@@ -137,7 +144,7 @@ const getBookById = async (req, res) => {
     let bookId = req.params.bookId;
 
     // validate ObjectId by path params
-    if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "Enter a correct book id" });
+    if (!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "Enter a valid book id" });
 
     // findById bookId form bookModel
     let getBook = await Book.findById(bookId).select({ __v: 0 });
@@ -220,10 +227,10 @@ const deleteBook = async function (req, res) {
 
       // check Book
       if (!book) {
-          return res.status(404).send({status: false,msg:"No such book exists"});
+          return res.status(404).send({status: false,message:"No such book exists"});
       }
       if (book.isDeleted == true) {
-          return res.status(404).send({ status: false, msg: "Book not found or has already been deleted" })
+          return res.status(404).send({ status: false, message: "Book not found or has already been deleted" })
       }
       
     await Book.updateOne({ _id: bookId }, { isDeleted: true ,deletedAt: Date.now(), reviews: 0} );

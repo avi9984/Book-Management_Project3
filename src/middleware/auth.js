@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { isValidObjectId } = require('../utils/validation');
 const Book = require('../models/bookModel');
+const User = require('../models/userModel');
 
 const authentication = (req, res, next) => {
   try {
@@ -32,12 +33,14 @@ const authorization = async (req, res, next) => {
 
     if (req.body.hasOwnProperty('userId')) {
       if (!isValidObjectId(req.body.userId)) return res.status(400).send({ status: false, message: "Enter a valid user id" });
-      userLogging = req.body.userId;
+      let userData = await User.findById(req.body.bookId);
+      if (!userData) return res.status(404).send({ status: false, message: "Error! Please check user id and try again" });
+      userLogging = userData._id;
     }
     if (req.params.hasOwnProperty('bookId')) {
       if (!isValidObjectId(req.params.bookId)) return res.status(400).send({ status: false, message: "Enter a valid book id" });
       let bookData = await Book.findById(req.params.bookId);
-      if (!bookData) return res.status(400).send({ status: false, message: "Error! Please check book id and try again" });
+      if (!bookData) return res.status(404).send({ status: false, message: "Error! Please check book id and try again" });
       userLogging = bookData.userId.toString();
     }
 
