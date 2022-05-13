@@ -61,16 +61,14 @@ const updateReview = async (req, res) => {
     if(!isValidObjectId(getID.reviewId)) return res.status(400).send({ status: false, message: "Enter a valid Review id" });
 
    //Checking if review data exist or not
-   let checkReviewID = await Review.findById({ _id: getID.reviewId });
-   if(!checkReviewID) return res.status(404).send({ status: false, message: "Review not found check id and try again" });
+   let checkReviewId = await Review.findById(getID.reviewId);
+   if(!checkReviewId) return res.status(404).send({ status: false, message: "Review not found check id and try again" });
 
-   //Checking if bookId data exist or not
-   let checkBookID = await Book.findById({ _id: getID.bookId });
-   if(checkBookID)  return res.status(404).send({ status: false, message: "Book not found check id and try again" });
+   if(checkReviewId.bookId.toString() !== getID.bookId) return res.status(404).send({ status: false, message: "Book not found check id and try again" });
 
     //Checking if review is already deleted or not
-    if(checkID.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
-
+    if(checkReviewId.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
+    
     //getting the data from request body to update the review
     let data = req.body;
 
@@ -80,7 +78,7 @@ const updateReview = async (req, res) => {
     //checking if user tries to change attributes which he/she is not allowed to do it
     if(data.hasOwnProperty('bookId') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('reviewedAt')) return res.status(400).send({ status: false, message: 'Action is Forbidden' });
 
-    //checking if the data is a valid data
+    //checking if the data is a valid data 
     if (validString(data.reviewedBy) || validString(data.review)) {
       return res.status(400).send({ status: false, message: "Enter valid data in review and reviewedBy" })
     }
@@ -117,16 +115,14 @@ const deleteReview = async (req, res) => {
     // check valid reviewId
     if(!isValidObjectId(getID.reviewId)) return res.status(400).send({ status: false, message: "Enter a valid Review id" });
 
-    //Checking if review data exist or not
-    let checkReviewID = await Review.findById({ _id: getID.reviewId });
-    if(!checkReviewID) return res.status(404).send({ status: false, message: "Review not found check id and try again" });
+   //Checking if review data exist or not
+   let checkReviewId = await Review.findById(getID.reviewId);
+   if(!checkReviewId) return res.status(404).send({ status: false, message: "Review not found check id and try again" });
 
-    //Checking if bookId data exist or not
-    let checkBookID = await Book.findById({ _id: getID.bookId });
-    if(checkBookID)  return res.status(404).send({ status: false, message: "Book not found check id and try again" });
+   if(checkReviewId.bookId.toString() !== getID.bookId) return res.status(404).send({ status: false, message: "Book not found check id and try again" });
 
     //Checking if review is already deleted or not
-    if(checkID.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
+    if(checkReviewId.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
 
     //Updating the review
     await Review.updateOne(
