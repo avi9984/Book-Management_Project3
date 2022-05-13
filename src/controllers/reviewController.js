@@ -1,11 +1,15 @@
 const Review = require('../models/reviewModel');
 const Book = require('../models/bookModel');
-const { isValidObjectId, isValidBody, validString } = require('../utils/validation')
+const { isValidObjectId, isValidBody, validString } = require('../utils/validation');
+const { validate } = require('../models/bookModel');
+const { request } = require('express');
 
+// POST /books/:bookId/review
 const addReview = async (req, res) => {
   try {
     let bookId = req.params.bookId;
 
+    // check valid bookId
     if(!isValidObjectId(bookId)) return res.status(400).send({ status: false, message: "Enter a valid book id" });
 
     let checkBookId = await Book.findById(bookId);
@@ -14,8 +18,11 @@ const addReview = async (req, res) => {
     if(checkBookId.isDeleted == true) return res.status(404).send({ status: false, message: "Book not found or might have been deleted" })
 
     let data = req.body;
+
+    // validate the request body
     if(isValidBody(data)) return res.status(400).send({ status: false, message: "Details required to add review to book" });
 
+    // check rating
     if(!data.rating) return res.status(400).send({ status: false, message: "Rating is required and should not be 0" });
 
     if(data.hasOwnProperty('reviewedBy')){
@@ -43,11 +50,17 @@ const addReview = async (req, res) => {
   }
 }
 
+
+// PUT /books/:bookId/review/:reviewId
+
 const updateReview = async (req, res) => {
   try {
     let getID = req.params
 
+    // check valid bookId
     if(!isValidObjectId(getID.bookId)) return res.status(400).send({ status: false, message: "Enter a valid Book id" });
+    
+    // check valid reviewId
     if(!isValidObjectId(getID.reviewId)) return res.status(400).send({ status: false, message: "Enter a valid Review id" });
 
     let checkID = await Review.findOne({ _id: getID.reviewId, bookId: getID.bookId });
@@ -56,6 +69,8 @@ const updateReview = async (req, res) => {
     if(checkID.isDeleted == true) return res.status(404).send({ status: false, message: "Review not found or might have been deleted" });
 
     let data = req.body;
+
+    // validate the body
     if(isValidBody(data)) return res.status(400).send({ status: false, message: "Data is required to update document" });
 
     if(data.hasOwnProperty('bookId') || data.hasOwnProperty('isDeleted') || data.hasOwnProperty('reviewedAt')) return res.status(400).send({ status: false, message: 'Action is Forbidden' });
@@ -65,6 +80,8 @@ const updateReview = async (req, res) => {
     }
 
     if(data.hasOwnProperty('rating')){
+
+      // check rating
       if(!validString(data.rating)) return res.status(400).send({ status: false, message: "Rating should be in numbers" });
 
       if(!((data.rating < 6 ) && (data.rating > 0))) return res.status(400).send({ status: false, message: "Rating should be between 1 - 5 numbers" });
@@ -82,11 +99,15 @@ const updateReview = async (req, res) => {
   }
 }
 
+// DELETE /books/:bookId/review/:reviewId
 const deleteReview = async (req, res) => {
   try {
     let getID = req.params
 
+    // check valid bookId
     if(!isValidObjectId(getID.bookId)) return res.status(400).send({ status: false, message: "Enter a valid Book id" });
+    
+    // check valid reviewId
     if(!isValidObjectId(getID.reviewId)) return res.status(400).send({ status: false, message: "Enter a valid Review id" });
 
     let checkID = await Review.findOne({ _id: getID.reviewId, bookId: getID.bookId });
