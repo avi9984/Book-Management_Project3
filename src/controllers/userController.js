@@ -97,7 +97,7 @@ const createUser = async (req, res) => {
 
     // Finally the registration of User is successful
 
-    let userData = await userModel.create(data);
+    let userData = await User.create(data);
 
     res.status(201).send({ status: true, message: "User created successfully", data: userData });
 
@@ -150,7 +150,7 @@ const userLogin = async function (req, res) {
 
     //Email check
 
-    const checkValidUser = await userModel.findOne({ email: data.email });
+    const checkValidUser = await User.findOne({ email: data.email });
 
     if (!checkValidUser) {
       return res.status(401).send({ status: false, msg: "Email Id is not correct " });
