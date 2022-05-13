@@ -22,10 +22,6 @@ const addReview = async (req, res) => {
 
     // check rating
     if(!data.rating) return res.status(400).send({ status: false, message: "Rating is required and should not be 0" });
-
-    if(data.hasOwnProperty('reviewedBy')){
-      if(validString(data.reviewedBy)) return res.status(400).send({ status: false, message: "Name should not contain numbers" });
-    }
     
     //checking if data has valid data or not
     if (validString(data.reviewedBy) || validString(data.review)) {
