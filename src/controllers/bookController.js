@@ -2,10 +2,6 @@ const Book = require('../models/bookModel');
 const User = require('../models/userModel');
 const Review = require('../models/reviewModel');
 const { isValidBody, isValidObjectId, validString, validDate, validISBN } = require('../utils/validation');
-const { validate, find } = require('../models/bookModel');
-const { query } = require('express');
-const { path } = require('express/lib/application');
-const bookModel = require('../models/bookModel');
 
 
        // POST /books
@@ -49,11 +45,6 @@ const createBook = async function (req, res) {
       return res.status(400).send({ status: false, message: "subcategory is required" });
     }
 
-    // check the userId
-    if (!data.userId) {
-      return res.status(400).send({ status: false, message: "UserId is required" })
-    }
-    
     // check the releasedAt
     if (!data.releasedAt) {
       return res.status(400).send({ status: false, message: "ReleasedAt date is required" })
@@ -166,7 +157,6 @@ const getBookById = async (req, res) => {
 const updateBook = async (req, res) => {
   try {
     let bookId = req.params.bookId
-    if(!bookId) return res.status(400).send({ status: false, message: "Book Id is required" });
 
     let checkBookId = await Book.findById(bookId);
     if(!checkBookId) return res.status(404).send({ status: false, message: "Book not found" });

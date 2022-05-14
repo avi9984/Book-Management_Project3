@@ -33,9 +33,9 @@ const authorization = async (req, res, next) => {
 
     if (req.body.hasOwnProperty('userId')) {
       if (!isValidObjectId(req.body.userId)) return res.status(400).send({ status: false, message: "Enter a valid user id" });
-      let userData = await User.findById(req.body.bookId);
+      let userData = await User.findById(req.body.userId);
       if (!userData) return res.status(404).send({ status: false, message: "Error! Please check user id and try again" });
-      userLogging = userData._id;
+      userLogging = userData._id.toString();
     }
     if (req.params.hasOwnProperty('bookId')) {
       if (!isValidObjectId(req.params.bookId)) return res.status(400).send({ status: false, message: "Enter a valid book id" });
